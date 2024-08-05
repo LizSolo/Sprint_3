@@ -1,32 +1,33 @@
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
+from config import Config
+from locators import Locators
 
-def test_login_via_home_page(driver, login_user, navigate_to_login, log_out):
-    login_user('lisasolominskaia12666@yandex.ru', '123456')
-    assert driver.current_url == "https://stellarburgers.nomoreparties.site/"
+
+def test_login_via_home_page(driver, login_user, log_out):
+    driver.get(Config.BASE_URL)
+    driver.find_element(*Locators.MAIN_SUBMIT_BUTTON).click()
+    WebDriverWait(driver, 5).until(expected_conditions.url_to_be(Config.LOGIN_URL))
+    login_user(Config.TEST_USER_EMAIL, Config.TEST_USER_PASSWORD)
+    assert driver.current_url == Config.BASE_URL
 
 
 def test_login_via_personal_account(driver, login_user, log_out):
-    driver.get("https://stellarburgers.nomoreparties.site/")
-    driver.find_element(By.XPATH, ".//nav[@class='AppHeader_header__nav__g5hnF']//p[text()='Личный Кабинет']").click()
-    WebDriverWait(driver, 5).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/login"))
-    login_user('lisasolominskaia12666@yandex.ru', '123456')
-    assert driver.current_url == "https://stellarburgers.nomoreparties.site/"
-
-
+    driver.get(Config.BASE_URL)
+    driver.find_element(*Locators.PERSONAL_ACCOUNT_BUTTON).click()
+    login_user(Config.TEST_USER_EMAIL, Config.TEST_USER_PASSWORD)
+    assert driver.current_url == Config.BASE_URL
 def test_register_and_login(driver, login_user, log_out):
-    driver.get("https://stellarburgers.nomoreparties.site/register")
-    driver.find_element(By.CLASS_NAME, 'Auth_link__1fOlj').click()
-    WebDriverWait(driver, 5).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/login"))
-    login_user('lisasolominskaia12666@yandex.ru', '123456')
-    assert driver.current_url == "https://stellarburgers.nomoreparties.site/"
-
+    driver.get(Config.REGISTER_URL)
+    driver.find_element(*Locators.SUBMIT_LINK).click()
+    WebDriverWait(driver, 5).until(expected_conditions.url_to_be(Config.LOGIN_URL))
+    login_user(Config.TEST_USER_EMAIL, Config.TEST_USER_PASSWORD)
+    assert driver.current_url == Config.BASE_URL
 
 def test_forgot_password_and_login(driver, login_user, log_out):
-    driver.get("https://stellarburgers.nomoreparties.site/forgot-password")
-    driver.find_element(By.CLASS_NAME, 'Auth_link__1fOlj').click()
-    WebDriverWait(driver, 5).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/login"))
-    login_user('lisasolominskaia12666@yandex.ru', '123456')
-    assert driver.current_url == "https://stellarburgers.nomoreparties.site/"
+    driver.get(Config.FORGOT_PASSWORD_URL)
+    driver.find_element(*Locators.SUBMIT_LINK).click()
+    WebDriverWait(driver, 5).until(expected_conditions.url_to_be(Config.LOGIN_URL))
+    login_user(Config.TEST_USER_EMAIL, Config.TEST_USER_PASSWORD)
+    assert driver.current_url == Config.BASE_URL

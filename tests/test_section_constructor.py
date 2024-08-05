@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
+from config import Config
+from locators import Locators
+
 
 @pytest.mark.parametrize("tab_name, tab_xpath, header_xpath", [
     ("Начинки", './/span[text()="Начинки"]', './/h2[text()="Начинки"]'),
@@ -10,9 +13,9 @@ from selenium.webdriver.support import expected_conditions
     ("Булки", './/span[text()="Булки"]', './/h2[text()="Булки"]'),
 ])
 def test_navigation_tabs(driver, tab_name, tab_xpath, header_xpath):
-    driver.get("https://stellarburgers.nomoreparties.site/")
+    driver.get(Config.BASE_URL)
     # Переход на страницу конструктора
-    driver.find_element(By.XPATH, ".//nav[@class='AppHeader_header__nav__g5hnF']//p[text()='Конструктор']").click()
+    driver.find_element(*Locators.CONSTRUCTOR_BUTTON).click()
 
     # Если вкладка Булки активна, переключаемся на другую вкладку
     if tab_name == "Булки":

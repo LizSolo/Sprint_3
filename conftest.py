@@ -6,6 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
+from config import Config
+from locators import Locators
+
 
 @pytest.fixture
 def driver():
@@ -24,23 +27,23 @@ def unique_user():
 @pytest.fixture
 def login_user(driver):
     def _login_user(email, password):
-        driver.get("https://stellarburgers.nomoreparties.site/login")
-        driver.find_element(By.NAME, 'name').send_keys(email)
-        driver.find_element(By.NAME, 'Пароль').send_keys(password)
-        driver.find_element(By.CSS_SELECTOR, '.button_button__33qZ0').click()
-        WebDriverWait(driver, 10).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/"))
+        driver.find_element(*Locators.EMAIL_INPUT).send_keys(email)
+        driver.find_element(*Locators.PASSWORD_INPUT).send_keys(password)
+        driver.find_element(*Locators.SUBMIT_BUTTON).click()
+        WebDriverWait(driver, 10).until(expected_conditions.url_to_be(Config.BASE_URL))
+
     return _login_user
 
 
 @pytest.fixture
 def go_to_personal_account(driver):
-    driver.get("https://stellarburgers.nomoreparties.site/")
-    driver.find_element(By.CSS_SELECTOR, '.button_button__33qZ0').click()
-    WebDriverWait(driver, 5).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/login"))
-    driver.find_element(By.NAME, 'name').send_keys('lisasolominskaia12666@yandex.ru')
-    driver.find_element(By.NAME, 'Пароль').send_keys('123456')
-    driver.find_element(By.CSS_SELECTOR, '.button_button__33qZ0').click()
-    WebDriverWait(driver, 10).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/"))
+    driver.get(Config.BASE_URL)
+    driver.find_element(*Locators.PERSONAL_ACCOUNT_BUTTON).click()
+    WebDriverWait(driver, 5).until(expected_conditions.url_to_be(Config.LOGIN_URL))
+    driver.find_element(*Locators.EMAIL_INPUT).send_keys(Config.TEST_USER_EMAIL)
+    driver.find_element(*Locators.PASSWORD_INPUT).send_keys(Config.TEST_USER_PASSWORD)
+    driver.find_element(*Locators.SUBMIT_BUTTON).click()
+    WebDriverWait(driver, 10).until(expected_conditions.url_to_be(Config.BASE_URL))
     yield driver
 
 
@@ -60,17 +63,10 @@ def register_user(driver):
 
 
 @pytest.fixture
-def navigate_to_login(driver):
-    driver.get("https://stellarburgers.nomoreparties.site/")
-    driver.find_element(By.CSS_SELECTOR, '.button_button__33qZ0').click()
-    WebDriverWait(driver, 5).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/login"))
-
-
-@pytest.fixture
 def log_out(driver):
     yield
-    driver.get("https://stellarburgers.nomoreparties.site/")
-    driver.find_element(By.XPATH, ".//nav[@class='AppHeader_header__nav__g5hnF']//p[text()='Личный Кабинет']").click()
+    driver.get(Config.BASE_URL)
+    driver.find_element(*Locators.PERSONAL_ACCOUNT_BUTTON).click()
     (WebDriverWait(driver, 5)
-     .until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, "Account_button__14Yp3"))).click())
-    WebDriverWait(driver, 10).until(expected_conditions.url_to_be("https://stellarburgers.nomoreparties.site/login"))
+     .until(expected_conditions.visibility_of_element_located((Locators.LOGOUT_BUTTON))).click())
+    WebDriverWait(driver, 10).until(expected_conditions.url_to_be(Config.LOGIN_URL))
